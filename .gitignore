@@ -1,6 +1,11 @@
+# Local settings
+private.py
+
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 
-# Static files
-*.css
+# Intellij IDE
+.idea
 
+# Logs
+*.log
