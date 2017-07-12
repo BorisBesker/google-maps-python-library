@@ -1,0 +1,8 @@
+{% extends 'base_template.html' %}
+
+{% block title %}User profile{% endblock %}
+
+{% block body %}
+  <p>You are logged in!</p>
+  <a href="{% url 'users:logout' %}">Logout</a>
+{% endblock %}

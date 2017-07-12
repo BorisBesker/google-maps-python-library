@@ -1,32 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Registration</title>
+{% extends 'login-register.html' %}
 
-  {% load static %}
+{% block title %}Register{% endblock %}
 
-  <link rel="stylesheet" type="text/css" href="{% static 'users/registration.css' %}" />
-</head>
-<body>
-  <div class="register-container">
-    <h1>Create a new account</h1>
-    <form method="post">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="field-wrapper">
-          <ul class="errorlist" id="{{ field.name }}-error">
-          {% for error in field.errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-          </ul>
-          <div class="field-label">{{ field.label_tag }}</div>
-          {{ field }}
-        </div>
-      {% endfor %}
-      <button type="submit" class="submit-register">Register</button>
-      <p class="note"><span>*</span> Required fields</p>
-    </form>
-  </div>
-</body>
-</html>
+{% block page-title %}Create a new account{% endblock %}
+
+{% block form-id %}register{% endblock %}
+
+{% block submit-button %}Register{% endblock %}
+
+{% block required-fields %}<p class="note"><span>*</span> Required fields</p>{% endblock %}
+
+{% block secondary-content %}
+  <h2>Already have an account?</h2>
+  <a class="login-register-button secondary" href="{% url 'users:login' %}">Sign in</a>
+{% endblock %}
