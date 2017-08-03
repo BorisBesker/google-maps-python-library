@@ -1,0 +1,14 @@
+{% extends 'login-register.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block page-title %}Sign in{% endblock %}
+
+{% block form-id %}login{% endblock %}
+
+{% block submit-button %}Login{% endblock %}
+
+{% block secondary-content %}
+  <h2>Not registered yet?</h2>
+  <a class="login-register-button secondary" href="{% url 'users:register' %}">Create an account</a>
+{% endblock %}

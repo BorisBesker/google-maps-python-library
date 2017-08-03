@@ -1,48 +1,33 @@
-from urlparse import urljoin
-from django.test import TestCase
+from django.core.urlresolvers import reverse
 
-from page_objects import PageObject, PageElement
-from selenium import webdriver
-
-
-class RegistrationPage(PageObject):
-    username = PageElement(name='username')
-    password = PageElement(name='password1')
-    confirmation_password = PageElement(name='password2')
-    registration_button = PageElement(class_name='submit-register')
+from pages import RegistrationPage
+from testcases import BaseTestCase
+from users.tests.mixins import CreateUserMixin
 
 
-class RegisterPageValidation(TestCase):
-    HOST = 'http://127.0.0.1:8080/'
+class RegisterPageTestCase(CreateUserMixin, BaseTestCase):
+    register_url = reverse('users:register')
 
     def setUp(self):
-        self.driver = webdriver.Chrome()
-        self.driver.get(urljoin(self.HOST, 'users/register'))
+        super(RegisterPageTestCase, self).setUp()
+        self.driver.get(self.get_absolute_path(self.register_url))
         self.page = RegistrationPage(self.driver)
 
-    def test_user_submitted_existing_username(self):
-        self.page.username = 'test'
-        self.page.password = 'pass1234'
-        self.page.confirmation_password = 'pass1234'
+    def fill_registration_form(self, username, password, confirmation_password=None):
+        self.page.username.send_keys(username)
+        self.page.password.send_keys(password)
+        self.page.confirmation_password.send_keys(confirmation_password or password)
         self.page.registration_button.click()
-        error_message = self.driver.find_element_by_id('username-error').text
-        self.assertEqual(error_message, 'A user with that username already exists.')
+
+    def test_user_submitted_existing_username(self):
+        user = self.create_user('existing_user')
+        self.fill_registration_form(user.username, self.password)
+        self.assertEqual(self.page.username_error_message.text, 'A user with that username already exists.')
 
     def test_user_submitted_too_short_passwords(self):
-        self.page.username = 'new_user'
-        self.page.password = 'pass123'
-        self.page.confirmation_password = 'pass123'
-        self.page.registration_button.click()
-        error_message = self.driver.find_element_by_id('password2-error').text
-        self.assertEqual(error_message, 'This password is too short. It must contain at least 8 characters.')
+        self.fill_registration_form('new_user', 'pass123')
+        self.assertEqual(self.page.password_error_message.text, 'This password is too short. It must contain at least 8 characters.')
 
     def test_user_submitted_two_different_passwords(self):
-        self.page.username = 'new_user'
-        self.page.password = 'pass1234'
-        self.page.confirmation_password = 'pass12345'
-        self.page.registration_button.click()
-        error_message = self.driver.find_element_by_id('password2-error').text
-        self.assertEqual(error_message, "The two password fields didn't match.")
-
-    def tearDown(self):
-        self.driver.close()
+        self.fill_registration_form('new_user', 'pass1234', 'pass12345')
+        self.assertEqual(self.page.password_error_message.text, "The two password fields didn't match.")

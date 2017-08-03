@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 
 class RegistrationForm(UserCreationForm):
@@ -24,3 +24,13 @@ class RegistrationForm(UserCreationForm):
             user.save()
 
         return user
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(LoginForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = User
+        fields = ['username', 'password']
